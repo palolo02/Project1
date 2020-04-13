@@ -23,7 +23,7 @@ def splitColumnsDF(df, indx, col, txtRemove = "", pivotTable = False, isNotNumbe
     tempDF = df[[indx,col,'year','state','city_or_county','n_killed','n_injured']]
     
     # Filter to get the desire years of analysis    
-    #tempDF = tempDF.loc[(tempDF["year"] >= 2014) & (tempDF["year"] <= 2017)]
+    tempDF = tempDF.loc[(tempDF["year"] >= 2014) & (tempDF["year"] <= 2017)]
     print(f"Starting analysis for {col}...")
     
     
@@ -76,7 +76,7 @@ def splitColumnsDF(df, indx, col, txtRemove = "", pivotTable = False, isNotNumbe
     internalTempDf.drop(conditionRemove, inplace=True)
     # Adjunst the index to match the original indx
     internalTempDf.set_index("index",inplace=True)
-    if (isNotNumber !=  True):
+    if (col == "participant_age"):
         internalTempDf["Value"] = internalTempDf["Value"].astype("int")
     
     # Debugging
@@ -134,7 +134,7 @@ def readWholeDataset(url):
             
             # Apply cleaning process and store dataframes
             gunStolenDF = splitColumnsDF(gunViolenceDf,"incident_id","gun_stolen", "Unknown", True)
-            gunTypeDF = splitColumnsDF(gunViolenceDf,"incident_id","gun_type", "Unknown", False)
+            gunTypeDF = splitColumnsDF(gunViolenceDf,"incident_id","gun_type", "Unknown", isNotNumber=False)
             ageDF = splitColumnsDF(gunViolenceDf,"incident_id","participant_age", "Unknown", False, isNotNumber=False)
             ageGroupDF = splitColumnsDF(gunViolenceDf,"incident_id","participant_age_group", "Unknown", True)
             genderDF = splitColumnsDF(gunViolenceDf,"incident_id","participant_gender", "Unknown", removeCommas=True)
@@ -164,7 +164,7 @@ def readWholeDataset(url):
             # Here, we clean each group and append it to the first one
             gunViolenceDf = gunViolenceDf.append(temp, ignore_index=True)
             gunStolenDF = gunStolenDF.append(splitColumnsDF(temp,"incident_id","gun_stolen", "Unknown", True), ignore_index=True)
-            gunTypeDF = gunTypeDF.append(splitColumnsDF(temp,"incident_id","gun_type", "Other", False))
+            gunTypeDF = gunTypeDF.append(splitColumnsDF(temp,"incident_id","gun_type", "Other", isNotNumber=False))
             ageDF = ageDF.append(splitColumnsDF(temp,"incident_id","participant_age", "Unknown", False, isNotNumber=False))
             ageGroupDF = ageGroupDF.append(splitColumnsDF(temp,"incident_id","participant_age_group", "Unknown", True))
             genderDF = genderDF.append(splitColumnsDF(temp,"incident_id","participant_gender", "Unknown", removeCommas=True))
